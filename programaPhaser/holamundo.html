@@ -1,0 +1,378 @@
+<!doctype html>
+<html>
+<head>
+<meta charset = "UTF -8"/>
+<title>hola mundo</title>
+<script src = "js/phaser.min.js"></script>
+
+</head>
+<body>
+<script>
+window.onload= function(){ //cuando se carga la pagina se empieza a ejecutar
+	var game = new Phaser.Game(752,450,Phaser.CANVAS,'juego Prueba',{preload:preload,create:create,update:update,render:render});
+	
+	var player,D,A;
+	var piso;
+	var player2;
+	var piso2;
+	var pisoArriba;
+	var diamantes,balas;
+	var disparos = 100;
+	var siguiente = 0;
+	var puntajes;
+	var Valor;
+	var velocidadBala=0;
+	var cont=0;
+	var bala;
+	var analog,arrow;
+	var catchFlag = false;
+	var fondo;
+	//game.graverdadDiamantes=100;
+	game.graverdadbalas=-150;
+	game.puntaje = 0;
+	var tecla;//para las teclas
+	function preload(){
+		//game.load.image('logo','imagenes/star.png'); para cargar una imagen
+		game.load.spritesheet('jose','imagenes/bartender.png',64/*ancho*/,64/*alto*/,4/*el numero de figuritas que tiene la imagen*/);
+		game.load.image('piso','imagenes/platform.png');
+		game.load.spritesheet('jason','imagenes/borracho.png',60,60,2);
+		game.load.image('diamante','imagenes/diamond.png');
+		game.load.image('bala','imagenes/cerveza.png');
+		game.load.image('fondo','imagenes/Stage1-1.png');
+
+		puntaje=game.add.text(25,16,'Puntaje:0',{font:'24px Arial',fill: '#000'});
+	}
+	function create(){//muestra el preolad
+		/* PARA IMAGENES
+/*var logo = game.add.sprite(game.world.centerX,game.world.centerY,'logo');para hacer que la imagen se presente en el centro del canvas
+logo.anchor.setTo(0.5,0.5);para centrar la imagen
+------------------------------------------------*/
+		/*PARA TEXTO
+var texto = "tutorial de \nPhaser";
+var style = {font: "40px Arial",fill:"#ffffff",aling:"center"};//definimos el tipo de letra
+var textoMotrado = game.add.text(game.world.centerX,game.world.centerY,texto, style);
+textoMotrado.anchor.setTo(0.5,0.5);
+-----------------------------------*/
+        fondo=game.add.tileSprite(0, 0, 835, 500, 'fondo');;
+		diamantes=game.add.group();
+		balas = game.add.group();
+		piso = game.add.group();
+		balas.enableBody=true;
+		balas.physicsBodyType=Phaser.Physics.arcade;
+		balas.createMultiple(10,'bala');
+		balas.setAll('checkWorldBounds',true);
+		balas.setAll('outOfBoundsKill',true);
+		game.giro=250;
+		/*PARA DAR MOVIMIENTO*/
+		player = game.add.sprite(100,300,'jose');
+		player.anchor.setTo(0.5,0.5);
+		//player.animations.add('moverse');//utiliza todos los cuadros de la imagen, hay q dar un nombre al movimiento
+		//player.animations.add('moverseDerecha',[5,6,7,8]);//los numeros son los frames o cuadros que se quieren que se mueva en este caso solo se
+		//movera a la derecha, se cuentas como en arreglos desde 0...
+		//animacion solo para que camine para un lado IMPORTANTE
+		//player.animations.play('moverse',10,true);//el 10 significa #de frames o cuadros por segundos
+		//si es falso una ver que termine los cuadros no se repiten
+		//true si hace que se repitan
+		var cont =0;
+		var cont1=0;
+		var cont2=0;
+		var a =0;
+		var y=600;
+		var list =[];
+		for(var i = 1;i<2000;i++)
+		{		
+			Valor= game.rnd.integerInRange((-100.00), 100.00);
+			list[i]=Valor;
+			console.log('lista'+Valor);
+			if(Valor >0)
+			{
+				
+				cont++;
+				piso = game.add.sprite(0+a,y,'piso');//se le suma para que aparesca mas abajo de los players
+				//piso.anchor.setTo(0.2,0.2);
+				piso.width=8;
+				piso.height = 4;
+				a=a+5;
+				y=y-3;
+				game.physics.enable(piso,Phaser.Physics.arcade);
+				piso.body.inmovable=true;
+				piso.body.allowGravity = false;
+				//piso1.add(piso);
+				game.physics.arcade.collide(player,piso)
+				if(y<600)
+				{
+					piso = game.add.sprite(0+a,600,'piso');//se le suma para que aparesca mas abajo de los players
+					//piso.anchor.setTo(0.5,0.5);
+					piso.width=8;
+					piso.height = 4;
+					game.physics.enable(piso,Phaser.Physics.arcade);
+					piso.body.inmovable=true;
+					piso.body.allowGravity = false;
+					//piso1.add(piso);
+					game.physics.arcade.collide(player,piso)
+				}
+			}
+			if(Valor<0)
+			{
+				cont1++;
+				piso = game.add.sprite(0+a,y,'piso');//se le suma para que aparesca mas abajo de los players
+				//piso.anchor.setTo(0.5,0.5);
+				piso.width=5;
+				piso.height = 4;
+				a=a+5;
+				y=y+3;
+				game.physics.enable(piso,Phaser.Physics.arcade);
+				piso.body.inmovable=true;
+				piso.body.allowGravity = false;
+				//piso1.add(piso);
+				game.physics.arcade.collide(player,piso)
+			}
+			/*
+		if (Valor =0)
+		{
+		cont2++;
+		piso = game.add.sprite(0+i,600,'piso');//se le suma para que aparesca mas abajo de los players
+		//piso.anchor.setTo(0.5,0.5);
+		piso.width=5;
+		piso.height = 4;}*/
+		}
+		/*analog = game.add.sprite(player.x+5, player.y, 'piso');
+		game.physics.enable(analog, Phaser.Physics.arcade);
+		analog.body.allowGravity = false;
+		analog.width = 8;
+		analog.rotation = 220;
+		//analog.alpha = 0;
+        analog.anchor.setTo(0.5,0.0);
+		
+		arrow = game.add.sprite(player.x-10, player.y, 'diamante');
+		game.physics.enable(arrow, Phaser.Physics.arcade);
+		arrow.anchor.setTo(0.1, 0.5);
+		arrow.body.moves = false;
+		arrow.body.allowGravity = false;*/
+		//arrow.alpha = 0;
+		
+		//analog.anchor.setTo(0.5, 0.0);
+		//var terreno = new Phaser.Physics.Box2D.Body(this.game, null, 0, 0, 0);
+		//terreno.setChain(list);
+		console.log('posi'+cont);
+		console.log('negativo'+cont1);
+		piso2=game.add.sprite(50,game.world.height-100,'piso');
+		//piso2.anchor.setTo(0.5,0.5);
+		piso2.width=150;
+		piso2.height=10;
+		pisoArriba=game.add.sprite(0,100,'piso');
+		pisoArriba.width=800;
+		player2 = game.add.sprite(600,300,'jason');
+		//player2.anchor.setTo(0.5,0.5);
+		player2.animations.add('moverseIzquierda',[0,1],true);
+		player.animations.add('Derecha',[0,1,2,3],true);
+		player.animations.add('Izquierda',[3,2,1,0],true);
+		
+		player2.animations.play('moverseIzquierda');
+		tecla=game.input.keyboard.createCursorKeys();
+		//para manejar por 
+		tecla2 = game.input.keyboard.addKeys({ 'up': Phaser.Keyboard.W, 'down': Phaser.Keyboard.S, 
+			'left': Phaser.Keyboard.A, 'right': Phaser.Keyboard.D,'barra':Phaser.Keyboard.SPACEBAR })
+		tecla3=game.input.keyboard.addKeys({})
+		
+		//teclado al personaje
+		
+		//if(game.input.activePointer.isDown)
+		//{
+			bala = balas.create(player.x+33,player.y+10,'bala');
+		
+		    game.physics.enable(bala, Phaser.Physics.ARCADE);
+			siguiente = game.time.now+disparos;
+			//game.physics.arcade.moveToPointer(bala,300);
+			bala.anchor.setTo(0.5, 0.5);
+			bala.body.collideWorldBounds = true;
+			bala.body.bounce.setTo(0.4, 0.4);
+			bala.inputEnabled = true;
+			bala.input.start(0, true);
+			bala.events.onInputDown.add(set);
+			bala.events.onInputUp.add(launch);	
+			
+		//}
+		/*---------------------------------------
+para inicializar el juego o el movimiento en  el mundo del canvas*/
+		game.physics.startSystem(Phaser.Physics.ARCADE);
+		//game.stage.backgroundColor = '#0072bc';
+		//game.physics.startSystem(Phaser.Physics.BOX2D);
+		game.physics.arcade.enable(player);
+		game.physics.arcade.enable(pisoArriba);
+		game.physics.arcade.enable(piso);
+		game.physics.arcade.enable(piso2);
+		game.physics.arcade.enable(player2);
+		//---------------------------------------------------------------------
+		player.body.gravity.set(0,100);//se puede poner gravedad en el eje x o en eje y
+		//solo esta la gravedad en eje y
+		player2.body.gravity.set(0,100);
+		player.body.collideWorldBounds = true; //esta propiedad de phaser permite
+		//utilizar los bodes del canvas para q el player colisione con los bordes
+		player.body.bounce.set(0.5);//se pone un valor positivo 
+		player2.body.collideWorldBounds = true;
+		/*--------------------------------------
+COLISIONES ENTRE SPRITES O ENTRE JUGADOR MUNDO O JUGADOR JUGADOR
+*/
+		player.enableBody = true;
+		piso.enableBody = true; //se pone true para dar valor verdadero al cuerpo
+		pisoArriba.enableBody=true;
+		piso2.enableBody = true;
+		console.log('entro al innomvible');
+		piso.body.immovable = true;//para que el piso no se mueva
+		pisoArriba.body.immovable=true;
+		player2.enableBody = true;
+		piso2.body.immovable=true;
+		analog.enableBody=true;
+		arrow.enableBody=true;
+	}
+	
+	function update(){
+		//esta funcion sirve para ya jugar en este caso solo para que colisionen
+		game.physics.arcade.collide(player,piso);
+		game.physics.arcade.collide(player2,pisoArriba);
+		game.physics.arcade.collide(player,piso2);
+		//game.physics.arcade.collide(balas,player);
+		game.physics.arcade.collide(diamantes,player2);
+		game.physics.arcade.collide(piso,player2);
+		//------------------------------------------------
+		
+		player.body.velocity.x=0;
+		player2.body.velocity.x = -90;//negativo por plano cartesiano   
+		player2.animations.play('moverseIzquierda',5,true);
+		//trayectoria();
+		if(tecla.left.isDown){
+			player.body.velocity.x = -90;//negativo por plano cartesiano   
+			player.animations.play('Izquierda',15,true);
+			//votardiamantes();
+		}
+		else if(tecla.right.isDown){
+			player.body.velocity.x=90;
+			player.animations.play('Derecha',15,true);
+			//votardiamantes();
+		}
+		else{
+			player.animations.stop();
+		}
+		
+		/*if(tecla2.left.isDown){
+			player2.body.velocity.x = -90;//negativo por plano cartesiano   
+			player2.animations.play('moverseIzquierda',10,true);
+			
+		}
+		else if(tecla2.right.isDown){
+			player2.body.velocity.x=90;
+			player2.animations.play('moverseDerecha',10,true);
+			
+		}
+		else{
+			player2.animations.stop();
+		}*/
+		//game.physics.arcade.overlap(balas,diamantes,balasXdiamante,null,this);
+		
+		/*if(game.input.activePointer.isDown)
+		{
+			disparar();
+			
+		}*/
+		//balas.rotation = game.physics.arcade.angleToPointer(balas);
+		
+		
+	}
+	
+	function  votardiamantes()
+	{
+		var diamante = diamantes.create(player.x,100,'diamante');
+		game.physics.arcade.enable(diamante);
+		diamante.body.velocity.y = game.graverdadDiamantes;
+	}
+	
+	function balasXdiamante(balas,diamantes)
+	{
+		diamantes.kill();
+		balas.kill();
+		game.puntaje=game.puntaje+5;
+		puntaje.setText('Puntaje:'+game.puntaje);
+	}
+	
+	if(catchFlag == true)
+	{
+			bala.x = game.input.activePointer.worldX;   
+			bala.y = game.input.activePointer.worldY;
+			//arrow.alpha = 1;
+			//analog.alpha = 0.5;
+			analog.height = game.physics.arcade.distanceToPointer(arrow);
+			velocidadBala=analog.height;
+	
+	
+	}
+	/*function disparar()
+	{
+		
+		
+		if(game.time.now > siguiente && balas.countDead() > 0 )
+		{
+			bala = balas.create(player.x,player.y,'bala');
+			siguiente = game.time.now+disparos;
+			game.physics.enable(bala, Phaser.Physics.ARCADE);
+			//game.physics.arcade.moveToPointer(bala,300);
+			bala.anchor.setTo(0.5, 0.5);
+			bala.body.collideWorldBounds = true;
+			bala.body.bounce.setTo(0.4, 0.4);
+			bala.inputEnabled = true;
+			bala.input.start(0, true);
+		
+			bala.events.onInputDown.add(set);
+			bala.events.onInputUp.add(launch);*/
+	
+	
+	/*function trayectoria()
+	{
+		bitmap.context.clearRect(0,0,game.width,game.height);
+		bitmap.context.fillStyle = 'rgba(255,255,255,0.5)';
+		var velocidad = 40;
+		var timeOffset =timeOffset+1 ;
+		timeOffset = timeOffset % velocidad;
+		var factordeCorrecion = 0.99;
+		var teta = -balas.rotation;
+		var x =0,y=0;
+		for(var i =0 + timeOffset/(1000*velocidad/60);i<3; i =i+0.03)
+		{
+			x = velocidadBala*i*Math.cos(teta)*factordeCorrecion;
+			y = velocidadBala*i*Math.sin(teta)*factordeCorrecion;
+			bitmap.context.fillRect(x+balas.x,balas.y-y,3,3);
+			if(y<-15)
+			break;
+		}
+		bitmap.dirty = true;
+	}*/
+	function set(bala,pointer)
+	{
+		bala.body.moves=false;
+		bala.body.velocity.setTo(0,0);
+		bala.body.allowGravity=false;
+		catchFlag = true;
+	}
+	function launch() {
+
+		catchFlag = false;
+		
+		bala.body.moves = true;
+		//arrow.alpha = 0;
+	    //analog.alpha = 0;
+		Xvector = (arrow.x - bala.x) * 3;
+		Yvector = (arrow.y - bala.y) * 3;
+		bala.body.allowGravity = true;  
+		bala.body.velocity.setTo(Xvector, Yvector);
+
+	}
+	
+	function render (){
+	game.debug.bodyInfo(bala, 32, 64);
+	}
+}
+
+</script>
+</body>
+
+</html>
